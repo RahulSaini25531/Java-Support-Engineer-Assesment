@@ -1,0 +1,24 @@
+
+Q1: Fix: LoanAccountService.getOverdueLoans()
+
+public List<LoanAccount> getOverdueLoans(List<LoanAccount> accounts) {
+
+    // Change 1: Initialize result as ArrayList, not null, to prevent NullPointerException
+    List<LoanAccount> result = new ArrayList<>();
+
+    for (LoanAccount account : accounts) {
+
+        // Chane 2: Guard against null dueDate (restructured accounts have dueDate==null).
+        if (account.getDueDate() == null) {
+            continue;
+        }
+
+        if (account.getDueDate().before(new Date())) {
+            if (account.getOutstandingBalance() > 0) {
+// Change 3: No changes required here as it excluded 0 balance accounts
+                result.add(account);
+            }
+        }
+    }
+    return result;
+}
