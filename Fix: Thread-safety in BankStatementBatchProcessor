@@ -1,0 +1,41 @@
+Q3: Fix: Thread-safety in BankStatementBatchProcessor
+
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.List;
+
+public class BankStatementBatchProcessor {
+
+   // Change:  Replace plain int with AtomicInteger.
+
+
+    private AtomicInteger processedCount = new AtomicInteger(0);
+
+    public void process(List<StatementRecord> records) throws InterruptedException {
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+
+        for (StatementRecord record : records) {
+            executor.submit(() -> {
+                processRecord(record);
+
+             // Changes: : incrementAndGet() is atomic — thread-safe increment
+
+
+                processedCount.incrementAndGet();
+            });
+        }
+
+        executor.shutdown();
+        executor.awaitTermination(5, TimeUnit.MINUTES);
+    }
+
+    public int getProcessedCount() {
+
+        //Changes:  AtomicInteger.get() provides a memory-visible read
+
+        return processedCount.get();
+    }
+}
