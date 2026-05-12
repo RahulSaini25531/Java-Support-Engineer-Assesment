@@ -1,0 +1,42 @@
+Q2: Diagnose: ConcurrentModificationException
+
+ERROR 2024-04-10 09:14:33 [http-nio-8080-exec-23]
+c.s.dlp.service.StatementProcessorService - Processing failed
+java.util.ConcurrentModificationException
+at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:911)
+at java.util.ArrayList$Itr.next(ArrayList.java:861)
+at c.s.dlp.service.StatementProcessorService
+.filterTransactions(StatementProcessorService.java:142)
+at c.s.dlp.service.StatementProcessorService
+.processStatement(StatementProcessorService.java:98)
+at c.s.dlp.controller.StatementController
+.upload(StatementController.java:67)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q1: What is the exact cause of ConcurrentModificationException in Java?
+Ans: ConcurrentModificationException occurs when a collection (like ArrayList) is structurally modified while it is being iterated, except through the iterator’s own remove() method.
+ArrayList keeps an internal modCount (modification count).
+
+ if (modCount != expectedModCount) throw new ConcurrentModificationException();
+
+1. When iterator is created → stores current modCount
+2. If collection is modified (add(), remove(), clear()) during iteration
+3. Iterator checks if stored modCount != current modCount
+4. If mismatch → throws ConcurrentModificationException
+
+This is a fail-fast mechanism to prevent inconsistent iteration behavior.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q2: What code pattern at line 142 most likely triggered this error?
+Ans: for (Transaction txn : transactions) {
+    if (shouldRemove(txn)) {
+        transactions.remove(txn);   // Line 142
+    }
+}
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q3: Provide the minimal code change (one or two lines) that resolves this safely.
+Ans:
+// Changes: Use Iterator.remove() which doesn't increment modCount
+Iterator<Transaction> it = transactions.iterator();
+while (it.hasNext())
+    if (shouldRemove(it.next())) it.remove();
