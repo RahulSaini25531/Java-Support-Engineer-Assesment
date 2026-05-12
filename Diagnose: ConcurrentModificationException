@@ -36,7 +36,7 @@ Ans: for (Transaction txn : transactions) {
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Q3: Provide the minimal code change (one or two lines) that resolves this safely.
 Ans:
-// Changes: Use Iterator.remove() which doesn't increment modCount
+// Fix: Use Iterator.remove() which doesn't increment modCount
 Iterator<Transaction> it = transactions.iterator();
 while (it.hasNext())
     if (shouldRemove(it.next())) it.remove();
