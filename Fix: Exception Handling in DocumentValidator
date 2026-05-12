@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class DocumentValidator {
 
-    // Changes: Use SLF4J logger instead of printStackTrace
+    // Fix: Use SLF4J logger instead of printStackTrace
     private static final Logger logger =
             LoggerFactory.getLogger(DocumentValidator.class);
 
@@ -30,15 +30,15 @@ public class DocumentValidator {
 
         } catch (IllegalArgumentException e) {
 
-            // Changes: Add log expected validation failures as warning
+            // Fix: Add log expected validation failures as warning
             logger.warn("Validation failed: {}", e.getMessage());
 
-            // Changes: Return failed ValidationResult
+            // Fix: Return failed ValidationResult
             return ValidationResult.invalid(e.getMessage());
 
         } catch (Exception e) {
 
-            // Changes: Log unexpected runtime errors with stack trace
+            // Fix: Log unexpected runtime errors with stack trace
             logger.error("Unexpected validation error", e);
 
             return ValidationResult.invalid("Unexpected validation error");
@@ -58,7 +58,7 @@ public class DocumentValidator {
 
             } catch (Exception e) {
 
-                // Changes: Do not silently swallow exceptions
+                // Fix: Do not silently swallow exceptions
                 logger.error("Batch validation failed", e);
             }
         }
