@@ -1,0 +1,38 @@
+Q4: Fix: Connection Leak in ReportDAO
+
+public class ReportDAO {
+
+    private DataSource dataSource;
+
+    public List<ReportEntry> fetchMonthlyReport(String accountId, int month, int year)
+            throws SQLException {
+
+        List<ReportEntry> entries = new ArrayList<>();
+
+// Changes: put Connection and PreparedStatement in try-with-resources so that it does not throw exception
+
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(
+                     "SELECT * FROM report_entries " +
+                     "WHERE account_id = ? AND MONTH(entry_date) = ? " +
+                     "AND YEAR(entry_date) = ?")) {
+
+            ps.setString(1, accountId);
+            ps.setInt(2, month);
+            ps.setInt(3, year);
+
+// Changes: put ResultSet in try-with-resources
+           
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+                    entries.add(mapRow(rs));
+                }
+            }              // ResultSet closed here
+
+        }                 // PreparedStatement and Connection closed here
+
+        return entries;
+    }
+}
