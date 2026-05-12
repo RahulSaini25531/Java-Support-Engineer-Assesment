@@ -9,7 +9,7 @@ public class ReportDAO {
 
         List<ReportEntry> entries = new ArrayList<>();
 
-// Changes: put Connection and PreparedStatement in try-with-resources so that it does not throw exception
+// Fix: put Connection and PreparedStatement in try-with-resources so that it does not throw exception
 
 
         try (Connection conn = dataSource.getConnection();
@@ -22,7 +22,7 @@ public class ReportDAO {
             ps.setInt(2, month);
             ps.setInt(3, year);
 
-// Changes: put ResultSet in try-with-resources
+// Fix: put ResultSet in try-with-resources
            
             try (ResultSet rs = ps.executeQuery()) {
 
